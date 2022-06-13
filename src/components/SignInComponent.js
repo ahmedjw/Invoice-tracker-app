@@ -1,61 +1,65 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
+  background-color: #2664c4;
   display: flex;
   flex-direction: column;
   flex: 1;
   height: 100%;
   align-items: center;
-`
+`;
 
 const ContentContainer = styled.div`
+  background-color: #9eb5da;
   display: flex;
   flex-direction: column;
   width: 600px;
   margin-top: 50px;
-`
+`;
 
 const Title = styled.h1`
   white-space: pre-line;
-`
+  margin-left: auto;
+  margin-right: auto;
+`;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
   padding: 30px;
   border: 1px solid black;
-`
+`;
 
 const Label = styled.label`
   margin-top: 20px;
   font-size: 24px;
-`
+`;
 
 const EmailInput = styled.input`
   height: 40px;
   font-size: 24px;
-`
+`;
 
 const PasswordInput = styled.input`
   height: 40px;
   font-size: 24px;
-`
+`;
 
 const CheckboxContainer = styled.div`
   display: flex;
   height: 50px;
   align-items: center;
-`
+`;
 
 const CheckboxLabel = styled(Label)`
   margin-top: 7px;
   margin-left: 10px;
-`
+`;
 
 const RememberMeCheckbox = styled.input`
   margin-top: 10px;
-`
+`;
 
 const SubmitButton = styled.input`
   height: 40px;
@@ -68,100 +72,102 @@ const SubmitButton = styled.input`
   font-weight: 600;
   cursor: pointer;
   margin-top: 40px;
-`
+`;
 
 const ErrorLabel = styled.div`
   font-size: 26px;
   color: red;
-`
+`;
 
-class SignInComponent extends React.Component {
-  
-  constructor(props) {
-    super(props);
+function SignInComponent() {
+  const [formDetails, setFormDetails] = useState({
+    email: "",
+    password: "",
+    rememberMe: false,
+    emailError: "",
+    passwordError: "",
+  });
 
-    this.state = {
-      email: "",
-      password: "",
-      rememberMe: false,
-      emailError: "",
-      passwordError: ""
+  function handleEmailInputChange(e) {
+    setFormDetails({ ...formDetails, email: e.target.value, emailError: "" });
+  }
+
+  function handlePasswordInputChange(e) {
+    setFormDetails({
+      ...formDetails,
+      password: e.target.value,
+      passwordError: "",
+    });
+  }
+
+  function handleRememberMeInputChange(e) {
+    setFormDetails({ ...formDetails, rememberMe: e.target.value });
+  }
+
+  function handleSubmit(e) {
+    var emailError = "";
+    var passwordError = "";
+
+    if (!formDetails.email) {
+      emailError = "Email can't be empty";
     }
 
-    this.handleEmailInputChange = this.handleEmailInputChange.bind(this)
-    this.handlePasswordInputChange = this.handlePasswordInputChange.bind(this)
-    this.handleRememberMeInputChange = this.handleRememberMeInputChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
-  }
-
-  handleEmailInputChange(e) {
-    this.setState({email: e.target.value, emailError: ""})
-  }
-
-  handlePasswordInputChange(e) {
-    this.setState({password: e.target.value, passwordError: ""})
-  }
-
-  handleRememberMeInputChange(e) {
-    this.setState({rememberMe: e.target.value})
-  }
-
-  handleSubmit(e) {
-    var emailError = ""
-    var passwordError = ""
-
-    if(!this.state.email) {
-      emailError = "Email can't be empty"
+    if (!formDetails.password) {
+      passwordError = "Password can't be empty";
+    } else if (formDetails.password.length < 8) {
+      passwordError = "Password should be at least 8 characters";
     }
 
-    if(!this.state.password) {
-      passwordError = "Password can't be empty" 
-    } else if (this.state.password.length < 8) {
-      passwordError = "Password should be at least 8 characters" 
-    }
-
-    if(emailError || passwordError) {
-      this.setState({emailError, passwordError})
-      e.preventDefault()
+    if (emailError || passwordError) {
+      setFormDetails({ ...formDetails, emailError, passwordError });
+      e.preventDefault();
     } else {
-      alert(JSON.stringify(this.state))
+      alert(JSON.stringify(formDetails));
     }
   }
 
-  render() {
-       return (
-        <Container>
-          <ContentContainer>
-          <Title>{"Sign In"}</Title>
-          
-          <Form onSubmit={this.handleSubmit}>
-            <Label>Email</Label>
-            <EmailInput type="email" 
-                        value={this.state.email} 
-                        onChange={this.handleEmailInputChange}/>
+  return (
+    <Container>
+      <ContentContainer>
+        <Title>{"Sign In"}</Title>
 
-            {this.state.emailError && <ErrorLabel>{this.state.emailError}</ErrorLabel>}
+        <Form onSubmit={handleSubmit}>
+          <Label>Email</Label>
+          <EmailInput
+            type="email"
+            value={formDetails.email}
+            onChange={handleEmailInputChange}
+          />
 
-            <Label>Password</Label>
-            <PasswordInput type="password" 
-                           value={this.state.password}
-                           onChange={this.handlePasswordInputChange}/>
+          {formDetails.emailError && (
+            <ErrorLabel>{formDetails.emailError}</ErrorLabel>
+          )}
 
-            {this.state.passwordError && <ErrorLabel>{this.state.passwordError}</ErrorLabel>}
+          <Label>Password</Label>
+          <PasswordInput
+            type="password"
+            value={formDetails.password}
+            onChange={handlePasswordInputChange}
+          />
 
-            <CheckboxContainer>
-              <RememberMeCheckbox type="checkbox" 
-                                  checked={this.state.rememberMe}
-                                  onChange={this.handleRememberMeInputChange}/>
-              <CheckboxLabel>Remember me</CheckboxLabel>
-            </CheckboxContainer>
+          {formDetails.passwordError && (
+            <ErrorLabel>{formDetails.passwordError}</ErrorLabel>
+          )}
 
-            <SubmitButton type="submit"/>
-          </Form>
-          </ContentContainer>
-        </Container>
-      ); 
-    }
-  }
+          <CheckboxContainer>
+            <RememberMeCheckbox
+              type="checkbox"
+              checked={formDetails.rememberMe}
+              onChange={handleRememberMeInputChange}
+            />
+            <CheckboxLabel>Remember me</CheckboxLabel>
+          </CheckboxContainer>
+
+          <SubmitButton type="submit" />
+        </Form>
+      </ContentContainer>
+    </Container>
+  );
+}
 
 export default SignInComponent;
