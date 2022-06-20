@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 
 const Container = styled.div`
   background-color: #2664c4;
@@ -67,20 +67,22 @@ const SubmitButton = styled.input`
   margin-top: 40px;
 `;
 
-const ErrorLabel = styled.div`
+const ErrorLabel = styled(ErrorMessage)`
   font-size: 26px;
   color: red;
 `;
 function handleValidation(values) {
+  let errors = {};
   if (!values.email) {
-    values.emailError = "Email can't be empty";
+    errors.emailError = "Email can't be empty";
   }
 
   if (!values.password) {
-    values.passwordError = "Password can't be empty";
+    errors.passwordError = "Password can't be empty";
   } else if (values.password.length < 8) {
-    values.passwordError = "Password should be at least 8 characters";
+    errors.passwordError = "Password should be at least 8 characters";
   }
+  return errors;
 }
 function SignInComponent() {
   return (
@@ -114,9 +116,9 @@ function SignInComponent() {
                 onChange={props.handleChange}
               />
 
-              {props.values.emailError && (
-                <ErrorLabel>{props.values.emailError}</ErrorLabel>
-              )}
+              <ErrorMessage name="email">
+                {(error) => <ErrorLabel>{error}</ErrorLabel>}
+              </ErrorMessage>
 
               <Label>Password</Label>
               <PasswordField
@@ -128,9 +130,9 @@ function SignInComponent() {
                 onBlur={props.handleBlur}
               />
 
-              {props.values.passwordError && (
-                <ErrorLabel>{props.values.passwordError}</ErrorLabel>
-              )}
+              <ErrorMessage name="password">
+                {(error) => <ErrorLabel>{error}</ErrorLabel>}
+              </ErrorMessage>
 
               <CheckboxContainer>
                 <RememberMeCheckbox
