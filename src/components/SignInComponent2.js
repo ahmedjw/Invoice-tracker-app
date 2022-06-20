@@ -1,8 +1,8 @@
+import { useFormik } from "formik";
+import React from "react";
 import styled from "styled-components";
-import { Formik, Form, Field, ErrorMessage } from "formik";
 
 const Container = styled.div`
-  background-color: #2664c4;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -11,7 +11,6 @@ const Container = styled.div`
 `;
 
 const ContentContainer = styled.div`
-  background-color: #9eb5da;
   display: flex;
   flex-direction: column;
   width: 600px;
@@ -20,8 +19,13 @@ const ContentContainer = styled.div`
 
 const Title = styled.h1`
   white-space: pre-line;
-  margin-left: auto;
-  margin-right: auto;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  border: 1px solid black;
 `;
 
 const Label = styled.label`
@@ -29,12 +33,12 @@ const Label = styled.label`
   font-size: 24px;
 `;
 
-const EmailField = styled(Field)`
+const EmailInput = styled.input`
   height: 40px;
   font-size: 24px;
 `;
 
-const PasswordField = styled(Field)`
+const PasswordInput = styled.input`
   height: 40px;
   font-size: 24px;
 `;
@@ -67,87 +71,78 @@ const SubmitButton = styled.input`
   margin-top: 40px;
 `;
 
-const ErrorLabel = styled(ErrorMessage)`
+const ErrorLabel = styled.div`
   font-size: 26px;
   color: red;
 `;
-function handleValidation(values) {
-  let errors = {};
-  if (!values.email) {
-    errors.emailError = "Email can't be empty";
-  }
 
-  if (!values.password) {
-    errors.passwordError = "Password can't be empty";
-  } else if (values.password.length < 8) {
-    errors.passwordError = "Password should be at least 8 characters";
-  }
-  return errors;
-}
 function SignInComponent() {
+  function handleValidation(values) {
+    if (!values.email) {
+      values.emailError = "Email can't be empty";
+    }
+
+    if (!values.password) {
+      values.passwordError = "Password can't be empty";
+    } else if (values.password.length < 8) {
+      values.passwordError = "Password should be at least 8 characters";
+    }
+  }
+  const signForm = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+      emailError: "",
+      passwordError: "",
+    },
+    validate: () => handleValidation,
+    onSubmit: (values) => {
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
   return (
     <Container>
       <ContentContainer>
         <Title>{"Sign In"}</Title>
-        <Formik
-          initialValues={{
-            email: "",
-            password: "",
-            rememberMe: false,
-            emailError: "",
-            passwordError: "",
-          }}
-          validate={handleValidation}
-          onSubmit={(props) => {
-            alert(JSON.stringify(props, null, 2));
-          }}
-        >
-          {(props) => (
-            <Form
-              onSubmit={props.handleSubmit}
-              style={{ display: "flex", flexDirection: "column", padding: 30 }}
-            >
-              <Label>Email</Label>
-              <EmailField
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={props.values.email}
-                onChange={props.handleChange}
-              />
 
-              <ErrorMessage name="email">
-                {(error) => <ErrorLabel>{error}</ErrorLabel>}
-              </ErrorMessage>
+        <Form onSubmit={signForm.handleSubmit}>
+          <Label>Email</Label>
+          <EmailInput
+            type="email"
+            name="email"
+            value={signForm.values.email}
+            onChange={signForm.handleChange}
+          />
 
-              <Label>Password</Label>
-              <PasswordField
-                type="password"
-                name="password"
-                placeholder="password"
-                value={props.values.password}
-                onChange={props.handleChange}
-                onBlur={props.handleBlur}
-              />
-
-              <ErrorMessage name="password">
-                {(error) => <ErrorLabel>{error}</ErrorLabel>}
-              </ErrorMessage>
-
-              <CheckboxContainer>
-                <RememberMeCheckbox
-                  type="checkbox"
-                  name="checkbox"
-                  checked={props.values.rememberMe}
-                  onChange={props.handleChange}
-                />
-                <CheckboxLabel>Remember me</CheckboxLabel>
-              </CheckboxContainer>
-
-              <SubmitButton type="submit" />
-            </Form>
+          {signForm.values.emailError && (
+            <ErrorLabel>{signForm.values.emailError}</ErrorLabel>
           )}
-        </Formik>
+
+          <Label>Password</Label>
+          <PasswordInput
+            type="password"
+            name="password"
+            value={signForm.values.password}
+            onChange={signForm.handleChange}
+          />
+
+          {signForm.values.passwordError && (
+            <ErrorLabel>{signForm.values.passwordError}</ErrorLabel>
+          )}
+
+          <CheckboxContainer>
+            <RememberMeCheckbox
+              type="checkbox"
+              name="checkbox"
+              checked={signForm.values.rememberMe}
+              onChange={signForm.handleChange}
+            />
+            <CheckboxLabel>Remember me</CheckboxLabel>
+          </CheckboxContainer>
+
+          <SubmitButton type="submit" />
+        </Form>
       </ContentContainer>
     </Container>
   );
