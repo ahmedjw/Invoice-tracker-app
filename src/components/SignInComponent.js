@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as yup from "yup";
 
 const Container = styled.div`
   background-color: #2664c4;
@@ -68,21 +69,21 @@ const SubmitButton = styled.input`
 `;
 
 const ErrorLabel = styled.div`
-  font-size: 26px;
+  font-size: 20px;
   color: red;
 `;
-function handleValidation(values) {
-  if (!values.email) {
-    values.emailError = "Email can't be empty";
-  }
 
-  if (!values.password) {
-    values.passwordError = "Password can't be empty";
-  } else if (values.password.length < 8) {
-    values.passwordError = "Password should be at least 8 characters";
-  }
-}
 function SignInComponent() {
+  let FormSchema = yup.object().shape({
+    email: yup
+      .string()
+      .email("not a valid Email")
+      .required("this Field is Required"),
+    password: yup
+      .string()
+      .min(8, "Password should be at least 8 characters")
+      .required("this Field is Required"),
+  });
   return (
     <Container>
       <ContentContainer>
@@ -92,13 +93,11 @@ function SignInComponent() {
             email: "",
             password: "",
             rememberMe: false,
-            emailError: "",
-            passwordError: "",
           }}
-          validate={handleValidation}
           onSubmit={(props) => {
             alert(JSON.stringify(props, null, 2));
           }}
+          validationSchema={FormSchema}
         >
           {(props) => (
             <Form
@@ -109,28 +108,25 @@ function SignInComponent() {
               <EmailField
                 type="email"
                 name="email"
-                placeholder="Email"
                 value={props.values.email}
                 onChange={props.handleChange}
               />
 
-              {props.values.emailError && (
-                <ErrorLabel>{props.values.emailError}</ErrorLabel>
-              )}
+              <ErrorMessage name="email">
+                {(err) => <ErrorLabel>{err}</ErrorLabel>}
+              </ErrorMessage>
 
               <Label>Password</Label>
               <PasswordField
                 type="password"
                 name="password"
-                placeholder="password"
                 value={props.values.password}
                 onChange={props.handleChange}
-                onBlur={props.handleBlur}
               />
 
-              {props.values.passwordError && (
-                <ErrorLabel>{props.values.passwordError}</ErrorLabel>
-              )}
+              <ErrorMessage name="password">
+                {(err) => <ErrorLabel>{err}</ErrorLabel>}
+              </ErrorMessage>
 
               <CheckboxContainer>
                 <RememberMeCheckbox
@@ -142,7 +138,7 @@ function SignInComponent() {
                 <CheckboxLabel>Remember me</CheckboxLabel>
               </CheckboxContainer>
 
-              <SubmitButton type="submit" />
+              <SubmitButton type="submit" disabled={props.isValidating} />
             </Form>
           )}
         </Formik>

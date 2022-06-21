@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import SignInComponent from "./SignInComponent2";
+import SignInComponent from "./SignInComponent";
 
 class RootComponent extends React.Component {
   render() {
